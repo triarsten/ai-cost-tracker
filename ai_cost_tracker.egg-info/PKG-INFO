@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: ai-cost-tracker
+Version: 0.1.0
+Requires-Python: >=3.12
+Requires-Dist: django>=5.0
+Requires-Dist: django-environ
+Requires-Dist: psycopg[binary]
+Requires-Dist: gunicorn
+Requires-Dist: celery[redis]
+Requires-Dist: django-celery-beat
+Requires-Dist: redis
+Requires-Dist: django-prometheus
+Requires-Dist: prometheus-client
+Requires-Dist: python-json-logger
+Requires-Dist: requests
+Requires-Dist: opentelemetry-sdk
+Requires-Dist: opentelemetry-instrumentation-django
+Requires-Dist: opentelemetry-instrumentation-celery
+Requires-Dist: opentelemetry-exporter-otlp-proto-grpc
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-django; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: factory-boy; extra == "dev"

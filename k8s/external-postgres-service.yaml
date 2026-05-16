@@ -1,0 +1,24 @@
+# Headless Service + Endpoints für externe PostgreSQL auf 192.168.178.48:5432
+# WICHTIG: ExternalName funktioniert nicht mit rohen IPs — deshalb Headless Service + Endpoints
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-external
+  namespace: staging
+spec:
+  clusterIP: None
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: postgres-external
+  namespace: staging
+subsets:
+  - addresses:
+      - ip: 192.168.178.48
+    ports:
+      - port: 5432

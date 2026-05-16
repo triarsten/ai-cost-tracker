@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-cost-tracker-worker
+  namespace: staging
+  labels:
+    app: ai-cost-tracker-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-cost-tracker-worker
+  template:
+    metadata:
+      labels:
+        app: ai-cost-tracker-worker
+    spec:
+      containers:
+        - name: worker
+          image: ghcr.io/USERNAME/ai-cost-tracker/app:latest
+          command: ["celery", "-A", "config", "worker", "-l", "info"]
+          envFrom:
+            - secretRef:
+                name: ai-cost-tracker-secrets
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
