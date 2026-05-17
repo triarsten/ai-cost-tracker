@@ -45,4 +45,4 @@ htmlcov/
 Thumbs.db
 
 # Secrets (never commit)
-k8s/secret.yaml
+k8s/secret.example.yaml

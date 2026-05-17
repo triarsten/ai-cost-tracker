@@ -113,4 +113,4 @@ class GeminiProvider(BaseProvider):
         logger.info(
             "Gemini Billing API: Direkter tagesgenaue Abruf über Cloud Billing API "
             "erfordert BigQuery-Export. Bitte GEMINI_ACCESS_TOKEN oder Service Account "
-            "konfigurieren
+            "konfigurieren "
