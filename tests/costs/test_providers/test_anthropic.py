@@ -1,5 +1,4 @@
 from datetime import date
-from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -22,16 +21,16 @@ def _mock_response(data: dict, status_code: int = 200):
     mock.raise_for_status = MagicMock()
     if status_code >= 400:
         from requests import HTTPError
+
         mock.raise_for_status.side_effect = HTTPError(response=mock)
     return mock
 
 
-def _make_bucket(date_str: str, model: str, input_tokens: int,
-                 output_tokens: int) -> dict:
+def _make_bucket(date_str: str, model: str, input_tokens: int, output_tokens: int) -> dict:
     """Hilfsfunktion: Erzeugt einen API-Bucket im echten Format."""
     return {
         "starting_at": f"{date_str}T00:00:00Z",
-        "ending_at":   f"{date_str}T23:59:59Z",
+        "ending_at": f"{date_str}T23:59:59Z",
         "results": [
             {
                 "model": model,
@@ -50,14 +49,11 @@ def _make_bucket(date_str: str, model: str, input_tokens: int,
 
 def test_fetch_costs_returns_entries(provider):
     api_response = {
-        "data": [
-            _make_bucket("2024-01-15", "claude-sonnet-4-6", 10000, 2000)
-        ],
+        "data": [_make_bucket("2024-01-15", "claude-sonnet-4-6", 10000, 2000)],
         "has_more": False,
     }
 
-    with patch.object(provider._session, "get",
-                      return_value=_mock_response(api_response)):
+    with patch.object(provider._session, "get", return_value=_mock_response(api_response)):
         entries = provider.fetch_costs(date(2024, 1, 15), date(2024, 1, 15))
 
     assert len(entries) == 1
@@ -70,16 +66,12 @@ def test_fetch_costs_returns_entries(provider):
 
 def test_fetch_costs_pagination(provider):
     page1 = {
-        "data": [
-            _make_bucket("2024-01-15", "claude-sonnet-4-6", 100, 50)
-        ],
+        "data": [_make_bucket("2024-01-15", "claude-sonnet-4-6", 100, 50)],
         "has_more": True,
         "next_page": "page2token",
     }
     page2 = {
-        "data": [
-            _make_bucket("2024-01-16", "claude-haiku-4-5", 200, 100)
-        ],
+        "data": [_make_bucket("2024-01-16", "claude-haiku-4-5", 200, 100)],
         "has_more": False,
     }
 
@@ -103,9 +95,9 @@ def test_fetch_costs_empty_key():
 
 def test_fetch_costs_http_error(provider):
     from requests import HTTPError
+
     mock_resp = _mock_response({}, status_code=500)
-    with patch.object(provider._session, "get",
-                      return_value=mock_resp), pytest.raises(HTTPError):
+    with patch.object(provider._session, "get", return_value=mock_resp), pytest.raises(HTTPError):
         provider.fetch_costs(date(2024, 1, 15), date(2024, 1, 15))
 
 
@@ -116,7 +108,7 @@ def test_fetch_costs_skips_malformed_entry(provider):
             # Leerer Bucket — wird übersprungen
             {
                 "starting_at": "2024-01-14T00:00:00Z",
-                "ending_at":   "2024-01-15T00:00:00Z",
+                "ending_at": "2024-01-15T00:00:00Z",
                 "results": [],
             },
             # Valider Bucket
@@ -124,8 +116,7 @@ def test_fetch_costs_skips_malformed_entry(provider):
         ],
         "has_more": False,
     }
-    with patch.object(provider._session, "get",
-                      return_value=_mock_response(api_response)):
+    with patch.object(provider._session, "get", return_value=_mock_response(api_response)):
         entries = provider.fetch_costs(date(2024, 1, 14), date(2024, 1, 15))
 
     assert len(entries) == 1
@@ -135,25 +126,28 @@ def test_fetch_costs_skips_malformed_entry(provider):
 def test_fetch_costs_with_cache_tokens(provider):
     """Cache-Tokens werden korrekt in die Kostenberechnung einbezogen."""
     api_response = {
-        "data": [{
-            "starting_at": "2024-01-15T00:00:00Z",
-            "ending_at":   "2024-01-16T00:00:00Z",
-            "results": [{
-                "model": "claude-sonnet-4-6",
-                "uncached_input_tokens": 1000,
-                "cache_creation": {
-                    "ephemeral_1h_input_tokens": 0,
-                    "ephemeral_5m_input_tokens": 500,
-                },
-                "cache_read_input_tokens": 2000,
-                "output_tokens": 300,
-                "server_tool_use": {"web_search_requests": 0},
-            }],
-        }],
+        "data": [
+            {
+                "starting_at": "2024-01-15T00:00:00Z",
+                "ending_at": "2024-01-16T00:00:00Z",
+                "results": [
+                    {
+                        "model": "claude-sonnet-4-6",
+                        "uncached_input_tokens": 1000,
+                        "cache_creation": {
+                            "ephemeral_1h_input_tokens": 0,
+                            "ephemeral_5m_input_tokens": 500,
+                        },
+                        "cache_read_input_tokens": 2000,
+                        "output_tokens": 300,
+                        "server_tool_use": {"web_search_requests": 0},
+                    }
+                ],
+            }
+        ],
         "has_more": False,
     }
-    with patch.object(provider._session, "get",
-                      return_value=_mock_response(api_response)):
+    with patch.object(provider._session, "get", return_value=_mock_response(api_response)):
         entries = provider.fetch_costs(date(2024, 1, 15), date(2024, 1, 15))
 
     assert len(entries) == 1
