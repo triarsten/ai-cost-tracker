@@ -100,10 +100,10 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TIMEZONE = "UTC"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_BEAT_SCHEDULE = {
-    "sync-all-providers-daily": {
-        "task": "apps.costs.tasks.sync_all_providers",
-        "schedule": crontab(hour=6, minute=0),
-        "kwargs": {"days_back": 2},
+    'sync-all-providers-every-6h': {
+        'task': 'apps.costs.tasks.sync_all_providers',
+        'schedule': crontab(hour='*/6', minute=0),
+        'kwargs': {'days_back': 30},
     },
 }
 
