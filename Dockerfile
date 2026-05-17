@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY pyproject.toml ./
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir ".[dev]" --target /build/deps
+    pip install --no-cache-dir ".[dev]"
 
 # ---- Stage 2: Runtime ----
 FROM python:3.12-slim AS runtime
@@ -24,18 +24,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Copy installed dependencies from builder
-COPY --from=builder /build/deps /usr/local/lib/python3.12/site-packages
+# Copy installed packages AND scripts from builder's system Python
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 COPY --chown=appuser:appuser apps/ apps/
 COPY --chown=appuser:appuser config/ config/
 COPY --chown=appuser:appuser gunicorn.conf.py ./
+COPY --chown=appuser:appuser manage.py ./
 COPY --chown=appuser:appuser pyproject.toml ./
 
-# OTel auto-instrumentation bootstrap must run after app code is present
-RUN pip install --no-cache-dir opentelemetry-distro opentelemetry-exporter-otlp-proto-grpc && \
-    opentelemetry-bootstrap -a install
+# OTel auto-instrumentation bootstrap
+RUN opentelemetry-bootstrap -a install
 
 RUN mkdir -p /app/staticfiles && chown appuser:appuser /app/staticfiles
 

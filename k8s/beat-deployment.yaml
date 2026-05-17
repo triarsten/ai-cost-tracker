@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: beat
-          image: ghcr.io/USERNAME/ai-cost-tracker/app:latest
+          image: ghcr.io/triarsten/ai-cost-tracker/app:latest
           command:
             - celery
             - -A

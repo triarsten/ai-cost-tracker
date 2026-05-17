@@ -34,8 +34,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/USERNAME/ai-cost-tracker/app:${{ github.sha }}
-            ghcr.io/USERNAME/ai-cost-tracker/app:latest
+            ghcr.io/triarsten/ai-cost-tracker/app:${{ github.sha }}
+            ghcr.io/triarsten/ai-cost-tracker/app:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -48,10 +48,10 @@ jobs:
 
       - name: Patch image tag in deployment manifests
         run: |
-          IMAGE="ghcr.io/USERNAME/ai-cost-tracker/app:${{ github.sha }}"
-          sed -i "s|ghcr.io/USERNAME/ai-cost-tracker/app:.*|${IMAGE}|g" k8s/deployment.yaml
-          sed -i "s|ghcr.io/USERNAME/ai-cost-tracker/app:.*|${IMAGE}|g" k8s/worker-deployment.yaml
-          sed -i "s|ghcr.io/USERNAME/ai-cost-tracker/app:.*|${IMAGE}|g" k8s/beat-deployment.yaml
+          IMAGE="ghcr.io/triarsten/ai-cost-tracker/app:${{ github.sha }}"
+          sed -i "s|ghcr.io/triarsten/ai-cost-tracker/app:.*|${IMAGE}|g" k8s/deployment.yaml
+          sed -i "s|ghcr.io/triarsten/ai-cost-tracker/app:.*|${IMAGE}|g" k8s/worker-deployment.yaml
+          sed -i "s|ghcr.io/triarsten/ai-cost-tracker/app:.*|${IMAGE}|g" k8s/beat-deployment.yaml
 
       - name: Apply Kubernetes manifests
         run: kubectl apply -f k8s/
